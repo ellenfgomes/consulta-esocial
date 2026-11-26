@@ -787,7 +787,7 @@ cat > public/index.html <<'EOF'
         </div>
         <div class="form-footer">
           <p id="cpf-help"><span aria-hidden="true">i</span> Aceita CPF com ou sem pontuação. Os dígitos verificadores serão validados.</p>
-          <span class="privacy-note"><span aria-hidden="true">●</span> Consulta privada</span>
+          <span class="privacy-note"><span aria-hidden="true">●</span> <span id="query-mode-label">Consulta privada</span></span>
         </div>
       </form>
     </section>
@@ -808,7 +808,7 @@ cat > public/index.html <<'EOF'
       </div>
     </section>
 
-    <footer>Dados pessoais são tratados para consulta e auditoria LGPD. A API limita-se ao S-2210.</footer>
+    <footer id="data-note">Dados pessoais são tratados para consulta e auditoria LGPD. A API limita-se ao S-2210.</footer>
   </main>
 </body>
 </html>
@@ -937,6 +937,8 @@ if (isGithubPagesPreview) {
   document.querySelector('#access-mode-label').textContent = 'Prévia pública';
   document.querySelector('#static-preview-notice').classList.remove('hidden');
   document.querySelector('#cpf-help').textContent = 'Demonstração visual: nenhum CPF será enviado ou consultado nesta página pública.';
+  document.querySelector('#query-mode-label').textContent = 'Somente demonstração';
+  document.querySelector('#data-note').textContent = 'Esta prévia pública não consulta nem envia dados pessoais. A consulta real ocorre apenas no servidor local.';
 }
 
 function cpfValido(cpf) {

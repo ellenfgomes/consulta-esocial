@@ -19,6 +19,8 @@ if (isGithubPagesPreview) {
   document.querySelector('#access-mode-label').textContent = 'Prévia pública';
   document.querySelector('#static-preview-notice').classList.remove('hidden');
   document.querySelector('#cpf-help').textContent = 'Demonstração visual: nenhum CPF será enviado ou consultado nesta página pública.';
+  document.querySelector('#query-mode-label').textContent = 'Somente demonstração';
+  document.querySelector('#data-note').textContent = 'Esta prévia pública não consulta nem envia dados pessoais. A consulta real ocorre apenas no servidor local.';
 }
 
 function cpfValido(cpf) {
