@@ -742,7 +742,7 @@ cat > public/index.html <<'EOF'
   <meta name="description" content="Consulte eventos eSocial S-2210 (CAT) por CPF.">
   <title>Consulta CAT | eSocial S-2210</title>
   <link rel="stylesheet" href="./styles.css?v=3">
-  <script defer src="./app.js?v=3"></script>
+  <script defer src="./app.js?v=4"></script>
 </head>
 <body>
   <main class="shell">
