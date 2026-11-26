@@ -19,6 +19,8 @@ O workflow publica automaticamente a pasta `public/` em https://ellenfgomes.gith
 
 O banco SQLite é criado automaticamente. Para webhooks e integrações externas, configure `API_KEY`; para rotas administrativas protegidas, configure também `JWT_SECRET` e `ADMIN_PASSWORD_HASH`. Em produção restrinja `CORS_ORIGINS` e configure `TRUST_PROXY=1` apenas quando houver proxy confiável.
 
+O painel exibe literalmente `nrRecibo`, `cdResposta` e `descResposta` quando esses campos existem no retorno. Sem eles, informa “Sem retorno oficial”; um registro importado no SQLite não comprova por si só transmissão ou processamento pelo eSocial.
+
 ## Teste imediato
 
 Depois de preencher `.env`, importe o exemplo:

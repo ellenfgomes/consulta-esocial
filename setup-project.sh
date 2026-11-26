@@ -504,13 +504,16 @@ function sendCatStatus(req, res) {
     cats: ocorrencias.map((item) => ({
       id_evento: item.id_evento,
       data_acidente: item.dt_acid,
+      tp_acid: item.tp_acid,
       tipo_acidente: ({ '1': 'Típico', '2': 'Doença ocupacional', '3': 'Trajeto' })[item.tp_acid] || item.tp_acid,
       tipo_cat: ({ '1': 'Inicial', '2': 'Reabertura', '3': 'Comunicação de Óbito' })[item.tp_cat] || item.tp_cat,
       tp_cat: item.tp_cat,
+      nr_rec_cat_orig: item.nr_rec_cat_orig,
       recibo_cat_origem: item.nr_rec_cat_orig,
       nr_recibo: item.nr_recibo,
       status: item.status,
       cd_resposta: item.cd_resposta,
+      desc_resposta: item.desc_resposta,
       mensagem: item.desc_resposta
     }))
   });
@@ -742,7 +745,7 @@ cat > public/index.html <<'EOF'
   <meta name="description" content="Consulte eventos eSocial S-2210 (CAT) por CPF.">
   <title>Consulta CAT | eSocial S-2210</title>
   <link rel="stylesheet" href="./styles.css?v=3">
-  <script defer src="./app.js?v=4"></script>
+  <script defer src="./app.js?v=5"></script>
 </head>
 <body>
   <main class="shell">
@@ -813,7 +816,7 @@ cat > public/index.html <<'EOF'
       </div>
     </section>
 
-    <footer id="data-note">Dados pessoais são tratados para consulta e auditoria LGPD. A API limita-se ao S-2210.</footer>
+    <footer id="data-note">Esta tela consulta o banco local. Campos nrRecibo, cdResposta e descResposta são exibidos conforme recebidos; sem esses campos, não há retorno oficial registrado.</footer>
   </main>
 </body>
 </html>
@@ -971,15 +974,9 @@ function mostrarMensagem(text) {
 function showResult(data) {
   const target = document.querySelector('#result');
   const cats = data.cats || [];
-  const statuses = new Set(cats.map((cat) => cat.status));
-  const accepted = statuses.has('ACEITO');
-  const sent = statuses.has('ENVIADO');
-  const pending = statuses.has('AGUARDANDO_RECIBO');
-  const statusClass = accepted || sent ? 'ok' : pending ? '' : 'error';
-  const statusLabel = accepted ? 'CAT ACEITA'
-    : sent ? 'CAT ENVIADA'
-      : pending ? 'AGUARDANDO RECIBO'
-        : data.status_geral === 'PENDENTE_OU_ERRO' ? 'PENDENTE OU ERRO' : 'NÃO ENVIADA';
+  const hasOfficialReturn = cats.some((cat) => cat.nr_recibo || cat.cd_resposta || cat.desc_resposta);
+  const statusLabel = hasOfficialReturn ? 'RETORNO OFICIAL DISPONÍVEL'
+    : cats.length ? 'SEM RETORNO OFICIAL' : 'SEM REGISTRO LOCAL';
   target.replaceChildren();
 
   const card = document.createElement('article');
@@ -989,7 +986,7 @@ function showResult(data) {
   const title = document.createElement('strong');
   title.textContent = `${data.total_ocorrencias} ocorrência(s) de CAT`;
   const badge = document.createElement('span');
-  badge.className = `badge ${statusClass}`;
+  badge.className = 'badge';
   badge.textContent = statusLabel;
   heading.append(title, badge);
   card.append(heading);
@@ -997,20 +994,23 @@ function showResult(data) {
   if (!cats.length) {
     const empty = document.createElement('p');
     empty.className = 'muted';
-    empty.textContent = 'Nenhum evento S-2210 localizado para este CPF.';
+    empty.textContent = 'Nenhum evento S-2210 localizado no banco local. Isso não confirma ausência no eSocial.';
     card.append(empty);
   }
 
   for (const cat of cats) {
     const details = document.createElement('div');
     details.className = 'result-grid';
+    const noOfficialReturn = 'Sem retorno oficial';
     const values = [
-      ['Data do acidente', cat.data_acidente || '—'],
-      ['Tipo da CAT', cat.tipo_cat || '—'],
-      ['Recibo oficial', cat.nr_recibo || 'Aguardando recibo'],
-      ['Status', ({ ACEITO: 'Aceito', ENVIADO: 'Enviado', ERRO: 'Erro', AGUARDANDO_RECIBO: 'Aguardando recibo' })[cat.status] || cat.status],
-      ['Tipo do acidente', cat.tipo_acidente || '—'],
-      ['Mensagem', cat.mensagem || cat.cd_resposta || '—']
+      ['Id (evtCAT)', cat.id_evento || '—'],
+      ['dtAcid', cat.data_acidente || '—'],
+      ['tpAcid', cat.tp_acid || '—'],
+      ['tpCat', cat.tp_cat || '—'],
+      ['nrRecCatOrig', cat.nr_rec_cat_orig || '—'],
+      ['nrRecibo', cat.nr_recibo || noOfficialReturn],
+      ['cdResposta', cat.cd_resposta || noOfficialReturn],
+      ['descResposta', cat.desc_resposta || noOfficialReturn]
     ];
     for (const [label, value] of values) {
       const item = document.createElement('div');
@@ -1154,6 +1154,8 @@ Localmente, o servidor escuta apenas em `127.0.0.1`; abra **http://localhost:300
 O workflow publica automaticamente a pasta `public/` em https://ellenfgomes.github.io/consulta-esocial/ após cada alteração nela. Essa URL é somente uma prévia estática do layout: por segurança, não consulta CPF nem contém dados da base local. Para consultas reais, use o servidor Node local em `http://localhost:3000`.
 
 O banco SQLite é criado automaticamente. Para webhooks e integrações externas, configure `API_KEY`; para rotas administrativas protegidas, configure também `JWT_SECRET` e `ADMIN_PASSWORD_HASH`. Em produção restrinja `CORS_ORIGINS` e configure `TRUST_PROXY=1` apenas quando houver proxy confiável.
+
+O painel exibe literalmente `nrRecibo`, `cdResposta` e `descResposta` quando esses campos existem no retorno. Sem eles, informa “Sem retorno oficial”; um registro importado no SQLite não comprova por si só transmissão ou processamento pelo eSocial.
 
 ## Teste imediato
 

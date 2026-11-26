@@ -352,13 +352,16 @@ function sendCatStatus(req, res) {
     cats: ocorrencias.map((item) => ({
       id_evento: item.id_evento,
       data_acidente: item.dt_acid,
+      tp_acid: item.tp_acid,
       tipo_acidente: ({ '1': 'Típico', '2': 'Doença ocupacional', '3': 'Trajeto' })[item.tp_acid] || item.tp_acid,
       tipo_cat: ({ '1': 'Inicial', '2': 'Reabertura', '3': 'Comunicação de Óbito' })[item.tp_cat] || item.tp_cat,
       tp_cat: item.tp_cat,
+      nr_rec_cat_orig: item.nr_rec_cat_orig,
       recibo_cat_origem: item.nr_rec_cat_orig,
       nr_recibo: item.nr_recibo,
       status: item.status,
       cd_resposta: item.cd_resposta,
+      desc_resposta: item.desc_resposta,
       mensagem: item.desc_resposta
     }))
   });

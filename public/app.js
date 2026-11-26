@@ -48,15 +48,9 @@ function mostrarMensagem(text) {
 function showResult(data) {
   const target = document.querySelector('#result');
   const cats = data.cats || [];
-  const statuses = new Set(cats.map((cat) => cat.status));
-  const accepted = statuses.has('ACEITO');
-  const sent = statuses.has('ENVIADO');
-  const pending = statuses.has('AGUARDANDO_RECIBO');
-  const statusClass = accepted || sent ? 'ok' : pending ? '' : 'error';
-  const statusLabel = accepted ? 'CAT ACEITA'
-    : sent ? 'CAT ENVIADA'
-      : pending ? 'AGUARDANDO RECIBO'
-        : data.status_geral === 'PENDENTE_OU_ERRO' ? 'PENDENTE OU ERRO' : 'NÃO ENVIADA';
+  const hasOfficialReturn = cats.some((cat) => cat.nr_recibo || cat.cd_resposta || cat.desc_resposta);
+  const statusLabel = hasOfficialReturn ? 'RETORNO OFICIAL DISPONÍVEL'
+    : cats.length ? 'SEM RETORNO OFICIAL' : 'SEM REGISTRO LOCAL';
   target.replaceChildren();
 
   const card = document.createElement('article');
@@ -66,7 +60,7 @@ function showResult(data) {
   const title = document.createElement('strong');
   title.textContent = `${data.total_ocorrencias} ocorrência(s) de CAT`;
   const badge = document.createElement('span');
-  badge.className = `badge ${statusClass}`;
+  badge.className = 'badge';
   badge.textContent = statusLabel;
   heading.append(title, badge);
   card.append(heading);
@@ -74,20 +68,23 @@ function showResult(data) {
   if (!cats.length) {
     const empty = document.createElement('p');
     empty.className = 'muted';
-    empty.textContent = 'Nenhum evento S-2210 localizado para este CPF.';
+    empty.textContent = 'Nenhum evento S-2210 localizado no banco local. Isso não confirma ausência no eSocial.';
     card.append(empty);
   }
 
   for (const cat of cats) {
     const details = document.createElement('div');
     details.className = 'result-grid';
+    const noOfficialReturn = 'Sem retorno oficial';
     const values = [
-      ['Data do acidente', cat.data_acidente || '—'],
-      ['Tipo da CAT', cat.tipo_cat || '—'],
-      ['Recibo oficial', cat.nr_recibo || 'Aguardando recibo'],
-      ['Status', ({ ACEITO: 'Aceito', ENVIADO: 'Enviado', ERRO: 'Erro', AGUARDANDO_RECIBO: 'Aguardando recibo' })[cat.status] || cat.status],
-      ['Tipo do acidente', cat.tipo_acidente || '—'],
-      ['Mensagem', cat.mensagem || cat.cd_resposta || '—']
+      ['Id (evtCAT)', cat.id_evento || '—'],
+      ['dtAcid', cat.data_acidente || '—'],
+      ['tpAcid', cat.tp_acid || '—'],
+      ['tpCat', cat.tp_cat || '—'],
+      ['nrRecCatOrig', cat.nr_rec_cat_orig || '—'],
+      ['nrRecibo', cat.nr_recibo || noOfficialReturn],
+      ['cdResposta', cat.cd_resposta || noOfficialReturn],
+      ['descResposta', cat.desc_resposta || noOfficialReturn]
     ];
     for (const [label, value] of values) {
       const item = document.createElement('div');
