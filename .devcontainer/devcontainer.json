@@ -1,0 +1,13 @@
+{
+  "containerEnv": {
+    "HOST": "0.0.0.0"
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Painel eSocial S-2210",
+      "visibility": "private",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}

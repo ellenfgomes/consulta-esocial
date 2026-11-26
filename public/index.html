@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Consulte eventos eSocial S-2210 (CAT) por CPF.">
+  <title>Consulta CAT | eSocial S-2210</title>
+  <link rel="stylesheet" href="/styles.css?v=2">
+  <script defer src="/app.js?v=2"></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Página inicial">
+        <span class="brand-mark" aria-hidden="true">CAT</span>
+        <span class="brand-copy">eSocial <strong>S-2210</strong><small>Comunicação de Acidente de Trabalho</small></span>
+      </a>
+      <span class="privacy-pill"><span aria-hidden="true"></span> Acesso privado</span>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">CONSULTA DE EVENTOS ESOCIAL</p>
+        <h1 id="page-title">Consulte CATs<br><span>pelo CPF do trabalhador</span></h1>
+        <p>Verifique o envio, o processamento e o recibo oficial de eventos S-2210.</p>
+      </div>
+      <div class="hero-mark" aria-hidden="true">
+        <span class="hero-mark-symbol">✓</span>
+        <span class="hero-mark-caption">S-2210<br>CAT</span>
+      </div>
+    </section>
+
+    <section class="search-panel" aria-labelledby="search-title">
+      <div class="section-heading">
+        <span class="step-number">01</span>
+        <div>
+          <h2 id="search-title">Localizar trabalhador</h2>
+          <p>Informe o CPF para consultar as ocorrências registradas.</p>
+        </div>
+      </div>
+      <form id="search-form" class="search-form" novalidate>
+        <label for="cpf-search">CPF do trabalhador</label>
+        <div class="search-controls">
+          <div class="cpf-input-wrap">
+            <span class="input-icon" aria-hidden="true">#</span>
+            <input id="cpf-search" name="cpf" type="text" inputmode="numeric" autocomplete="off"
+              placeholder="000.000.000-00" maxlength="14" aria-describedby="cpf-help" required>
+          </div>
+          <button class="button button-primary" type="submit">
+            <span>Consultar CPF</span><span aria-hidden="true">→</span>
+          </button>
+        </div>
+        <div class="form-footer">
+          <p id="cpf-help"><span aria-hidden="true">i</span> Aceita CPF com ou sem pontuação. Os dígitos verificadores serão validados.</p>
+          <span class="privacy-note"><span aria-hidden="true">●</span> Consulta privada</span>
+        </div>
+      </form>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="results-heading">
+        <div>
+          <p class="eyebrow">RESULTADO DA BUSCA</p>
+          <h2 id="results-title">Situação da CAT</h2>
+        </div>
+      </div>
+      <div id="result" aria-live="polite" aria-atomic="true">
+        <div class="empty-state">
+          <span class="empty-icon" aria-hidden="true">⌕</span>
+          <strong>Aguardando consulta</strong>
+          <p>Digite um CPF válido acima para visualizar os eventos S-2210 encontrados.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>Dados pessoais são tratados para consulta e auditoria LGPD. A API limita-se ao S-2210.</footer>
+  </main>
+</body>
+</html>
