@@ -1,6 +1,11 @@
 'use strict';
 
+const isGithubPagesPreview = location.hostname.endsWith('.github.io');
+
 async function consultarCpf(cpf) {
+  if (isGithubPagesPreview) {
+    throw new Error('Prévia estática: esta página não consulta dados reais. Use http://localhost:3000 para consultar o banco local.');
+  }
   const response = await fetch(`/api/painel/s2210/status/${encodeURIComponent(cpf)}`);
   const data = await response.json().catch(() => ({}));
   if (response.status === 404) {
@@ -8,6 +13,12 @@ async function consultarCpf(cpf) {
   }
   if (!response.ok) throw new Error(data.erro || `Falha HTTP ${response.status}`);
   return data;
+}
+
+if (isGithubPagesPreview) {
+  document.querySelector('#access-mode-label').textContent = 'Prévia pública';
+  document.querySelector('#static-preview-notice').classList.remove('hidden');
+  document.querySelector('#cpf-help').textContent = 'Demonstração visual: nenhum CPF será enviado ou consultado nesta página pública.';
 }
 
 function cpfValido(cpf) {

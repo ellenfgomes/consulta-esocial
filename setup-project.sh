@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p public xml-entrada data certs .devcontainer
+mkdir -p public xml-entrada data certs .devcontainer .github/workflows
 
 cat > .devcontainer/devcontainer.json <<'EOF'
 {
@@ -17,6 +17,49 @@ cat > .devcontainer/devcontainer.json <<'EOF'
     }
   }
 }
+EOF
+
+cat > .github/workflows/pages.yml <<'EOF'
+name: Publish GitHub Pages preview
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "public/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Deploy site
+        id: deployment
+        uses: actions/deploy-pages@v4
 EOF
 
 cat > package.json <<'EOF'
@@ -692,17 +735,17 @@ cat > public/index.html <<'EOF'
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Consulte eventos eSocial S-2210 (CAT) por CPF.">
   <title>Consulta CAT | eSocial S-2210</title>
-  <link rel="stylesheet" href="/styles.css?v=2">
-  <script defer src="/app.js?v=2"></script>
+  <link rel="stylesheet" href="./styles.css?v=3">
+  <script defer src="./app.js?v=3"></script>
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Página inicial">
+      <a class="brand" href="./" aria-label="Página inicial">
         <span class="brand-mark" aria-hidden="true">CAT</span>
         <span class="brand-copy">eSocial <strong>S-2210</strong><small>Comunicação de Acidente de Trabalho</small></span>
       </a>
-      <span class="privacy-pill"><span aria-hidden="true"></span> Acesso privado</span>
+      <span class="privacy-pill"><span class="privacy-dot" aria-hidden="true"></span><span id="access-mode-label">Acesso privado</span></span>
     </header>
 
     <section class="hero" aria-labelledby="page-title">
@@ -716,6 +759,10 @@ cat > public/index.html <<'EOF'
         <span class="hero-mark-caption">S-2210<br>CAT</span>
       </div>
     </section>
+
+    <aside id="static-preview-notice" class="static-preview-notice hidden" role="note">
+      Prévia pública do layout. A consulta desta página estática não acessa dados reais; use o servidor local para consultar o banco S-2210.
+    </aside>
 
     <section class="search-panel" aria-labelledby="search-title">
       <div class="section-heading">
@@ -785,7 +832,9 @@ button, input { font: inherit; }
 .brand-copy { display: grid; grid-template-columns: auto auto; align-items: baseline; column-gap: 5px; font-size: 15px; }
 .brand-copy small { grid-column: 1 / -1; margin-top: 3px; color: #778398; font-size: 11px; }
 .privacy-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #dfe9e3; border-radius: 30px; background: #f3fbf5; color: #287044; font-size: 12px; font-weight: 700; }
-.privacy-pill span, .privacy-note span { width: 7px; height: 7px; border-radius: 50%; background: #28a45a; }
+.privacy-pill .privacy-dot, .privacy-note span { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #28a45a; }
+.hidden { display: none !important; }
+.static-preview-notice { margin: -10px 0 24px; padding: 12px 15px; border: 1px solid #f0dfb8; border-radius: 10px; background: #fff8e9; color: #765317; font-size: 12px; line-height: 1.5; }
 .hero { display: flex; min-height: 235px; align-items: center; justify-content: space-between; gap: 32px; margin-bottom: 26px; padding: 36px 42px; overflow: hidden; border-radius: 22px; background: linear-gradient(120deg, #102d58 0%, #174e93 100%); color: #fff; }
 .hero-copy { max-width: 610px; }
 .eyebrow { margin: 0 0 10px; color: #71aaff; font-size: 10px; font-weight: 850; letter-spacing: .15em; }
@@ -868,7 +917,12 @@ EOF
 cat > public/app.js <<'EOF'
 'use strict';
 
+const isGithubPagesPreview = location.hostname.endsWith('.github.io');
+
 async function consultarCpf(cpf) {
+  if (isGithubPagesPreview) {
+    throw new Error('Prévia estática: esta página não consulta dados reais. Use http://localhost:3000 para consultar o banco local.');
+  }
   const response = await fetch(`/api/painel/s2210/status/${encodeURIComponent(cpf)}`);
   const data = await response.json().catch(() => ({}));
   if (response.status === 404) {
@@ -876,6 +930,12 @@ async function consultarCpf(cpf) {
   }
   if (!response.ok) throw new Error(data.erro || `Falha HTTP ${response.status}`);
   return data;
+}
+
+if (isGithubPagesPreview) {
+  document.querySelector('#access-mode-label').textContent = 'Prévia pública';
+  document.querySelector('#static-preview-notice').classList.remove('hidden');
+  document.querySelector('#cpf-help').textContent = 'Demonstração visual: nenhum CPF será enviado ou consultado nesta página pública.';
 }
 
 function cpfValido(cpf) {
@@ -1080,6 +1140,10 @@ npm start
 Execute os comandos na pasta do projeto. No Windows, abra o PowerShell nessa pasta; se `node` ou `npm` não forem reconhecidos, instale Node.js 20 LTS e reinicie o terminal. Copie `.env.example` para `.env` apenas se ainda não existir um `.env`; mantenha `PANEL_QUERY_AUTH_DISABLED=true` para a consulta sem senha.
 
 Localmente, o servidor escuta apenas em `127.0.0.1`; abra **http://localhost:3000**. Não use `python -m http.server`: ele serve os arquivos da página, mas não executa a API de consulta. No Codespaces, o `.devcontainer/devcontainer.json` configura `HOST=0.0.0.0` e a porta 3000 privada. A consulta grava auditoria de IP, origem e CPF. Para um ambiente público, defina `PANEL_QUERY_AUTH_DISABLED=false` e use a rota externa protegida por API key.
+
+## Prévia no GitHub Pages
+
+O workflow publica automaticamente a pasta `public/` em https://ellenfgomes.github.io/consulta-esocial/ após cada alteração nela. Essa URL é somente uma prévia estática do layout: por segurança, não consulta CPF nem contém dados da base local. Para consultas reais, use o servidor Node local em `http://localhost:3000`.
 
 O banco SQLite é criado automaticamente. Para webhooks e integrações externas, configure `API_KEY`; para rotas administrativas protegidas, configure também `JWT_SECRET` e `ADMIN_PASSWORD_HASH`. Em produção restrinja `CORS_ORIGINS` e configure `TRUST_PROXY=1` apenas quando houver proxy confiável.
 

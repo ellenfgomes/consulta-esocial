@@ -16,7 +16,9 @@ button, input { font: inherit; }
 .brand-copy { display: grid; grid-template-columns: auto auto; align-items: baseline; column-gap: 5px; font-size: 15px; }
 .brand-copy small { grid-column: 1 / -1; margin-top: 3px; color: #778398; font-size: 11px; }
 .privacy-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #dfe9e3; border-radius: 30px; background: #f3fbf5; color: #287044; font-size: 12px; font-weight: 700; }
-.privacy-pill span, .privacy-note span { width: 7px; height: 7px; border-radius: 50%; background: #28a45a; }
+.privacy-pill .privacy-dot, .privacy-note span { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #28a45a; }
+.hidden { display: none !important; }
+.static-preview-notice { margin: -10px 0 24px; padding: 12px 15px; border: 1px solid #f0dfb8; border-radius: 10px; background: #fff8e9; color: #765317; font-size: 12px; line-height: 1.5; }
 .hero { display: flex; min-height: 235px; align-items: center; justify-content: space-between; gap: 32px; margin-bottom: 26px; padding: 36px 42px; overflow: hidden; border-radius: 22px; background: linear-gradient(120deg, #102d58 0%, #174e93 100%); color: #fff; }
 .hero-copy { max-width: 610px; }
 .eyebrow { margin: 0 0 10px; color: #71aaff; font-size: 10px; font-weight: 850; letter-spacing: .15em; }

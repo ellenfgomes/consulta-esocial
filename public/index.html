@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Consulte eventos eSocial S-2210 (CAT) por CPF.">
   <title>Consulta CAT | eSocial S-2210</title>
-  <link rel="stylesheet" href="/styles.css?v=2">
-  <script defer src="/app.js?v=2"></script>
+  <link rel="stylesheet" href="./styles.css?v=3">
+  <script defer src="./app.js?v=3"></script>
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Página inicial">
+      <a class="brand" href="./" aria-label="Página inicial">
         <span class="brand-mark" aria-hidden="true">CAT</span>
         <span class="brand-copy">eSocial <strong>S-2210</strong><small>Comunicação de Acidente de Trabalho</small></span>
       </a>
-      <span class="privacy-pill"><span aria-hidden="true"></span> Acesso privado</span>
+      <span class="privacy-pill"><span class="privacy-dot" aria-hidden="true"></span><span id="access-mode-label">Acesso privado</span></span>
     </header>
 
     <section class="hero" aria-labelledby="page-title">
@@ -29,6 +29,10 @@
         <span class="hero-mark-caption">S-2210<br>CAT</span>
       </div>
     </section>
+
+    <aside id="static-preview-notice" class="static-preview-notice hidden" role="note">
+      Prévia pública do layout. A consulta desta página estática não acessa dados reais; use o servidor local para consultar o banco S-2210.
+    </aside>
 
     <section class="search-panel" aria-labelledby="search-title">
       <div class="section-heading">

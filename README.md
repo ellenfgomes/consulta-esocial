@@ -13,6 +13,10 @@ Execute os comandos na pasta do projeto. No Windows, abra o PowerShell nessa pas
 
 Localmente, o servidor escuta apenas em `127.0.0.1`; abra **http://localhost:3000**. Não use `python -m http.server`: ele serve os arquivos da página, mas não executa a API de consulta. No Codespaces, o `.devcontainer/devcontainer.json` configura `HOST=0.0.0.0` e a porta 3000 privada. A consulta grava auditoria de IP, origem e CPF. Para um ambiente público, defina `PANEL_QUERY_AUTH_DISABLED=false` e use a rota externa protegida por API key.
 
+## Prévia no GitHub Pages
+
+O workflow publica automaticamente a pasta `public/` em https://ellenfgomes.github.io/consulta-esocial/ após cada alteração nela. Essa URL é somente uma prévia estática do layout: por segurança, não consulta CPF nem contém dados da base local. Para consultas reais, use o servidor Node local em `http://localhost:3000`.
+
 O banco SQLite é criado automaticamente. Para webhooks e integrações externas, configure `API_KEY`; para rotas administrativas protegidas, configure também `JWT_SECRET` e `ADMIN_PASSWORD_HASH`. Em produção restrinja `CORS_ORIGINS` e configure `TRUST_PROXY=1` apenas quando houver proxy confiável.
 
 ## Teste imediato
